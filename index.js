@@ -6,12 +6,14 @@ require("dotenv").config();
 const app = express();
 app.use(bodyParser.json());
 
+
 const db = mysql.createConnection({
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
 });
+
 
 db.connect((err) => {
   if (err) {
@@ -20,6 +22,7 @@ db.connect((err) => {
   }
   console.log("Connected to the database.");
 });
+
 
 app.post("/addSchool", (req, res) => {
   const { name, address, latitude, longitude } = req.body;
@@ -40,6 +43,7 @@ app.post("/addSchool", (req, res) => {
   });
 });
 
+
 app.get("/listSchools", (req, res) => {
   const { latitude, longitude } = req.query;
   if (!latitude || !longitude) {
@@ -52,6 +56,7 @@ app.get("/listSchools", (req, res) => {
   const query = "SELECT id, name, address, latitude, longitude FROM schools";
   db.execute(query, [], (err, results) => {
     if (err) {
+      console.error("Error fetching data from database:", err);
       return res.status(500).send("Error fetching data from database.");
     }
 
@@ -67,6 +72,12 @@ app.get("/listSchools", (req, res) => {
 
     res.json(schools);
   });
+});
+
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
 });
 
 module.exports = app;
